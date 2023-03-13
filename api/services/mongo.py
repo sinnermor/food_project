@@ -9,7 +9,7 @@ import config
 
 
 class MongoClient:
-    """Базовый класс для работы с транзакциями."""
+    """Base mongo client"""
 
     def __init__(self, motor_client: AsyncIOMotorClient, mongo_db: AsyncIOMotorDatabase):
         self.motor_client = motor_client
@@ -17,29 +17,29 @@ class MongoClient:
 
     @classmethod
     def create(cls, mongo_url: str, mongo_db: str):  # type: ignore
-        """Метод для создания и запуска клиента Redis.
+        """mongo connction url.
 
         Args:
-            mongo_url: урл подключения к Моного.
-            mongo_db: имя бд Монго.
+            mongo_url: mongo url.
+            mongo_db: mongo db.
 
         Returns:
-            экземпляр класса
+            obj cls
         """
         motor_client = AsyncIOMotorClient(mongo_url)
         mongo_db = motor_client[mongo_db]
         return cls(motor_client=motor_client, mongo_db=mongo_db)
 
     async def close(self) -> None:
-        """Метод для закрытия соединения с Монго."""
+        """Method to close mongo connection."""
         self.motor_client.close()
         logging.info("The MongoDB connection is closed!")
 
     async def start(self) -> None:
-        """Метод для проверки соединения с Монго.
+        """Method to check mongo connectiom.
 
         Raises:
-            PyMongoError: ошибка в Монго
+            PyMongoError: mongo conn error
         """
         try:
             await self.mongo_db.command("ping")
