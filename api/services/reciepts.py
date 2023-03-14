@@ -25,7 +25,7 @@ class RecipesProvider:
                     count = min(count, value // food_count) if count != 0 else food_count
         return count
 
-    def count_recipes_with_friz(self):
+    def count_recipes_with_friz(self) -> Dict:
         """Method to find all recipes can be cooked with food_list.
 
         Returns:

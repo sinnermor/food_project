@@ -4,6 +4,7 @@ import aiohttp.web
 from aiohttp.web import Application
 
 import config
+from api.middlewares import catch_exceptions
 from api.routes import inject_routes
 from api.services.mongo import MongoClient
 
@@ -23,7 +24,7 @@ async def mongo_client(app: Application) -> None:
 
 def run():
     logging.basicConfig(level=getattr(logging, config.LOG_LEVEL))
-    app = Application()
+    app = Application(middlewares=[catch_exceptions])
     inject_routes(app)
     app.cleanup_ctx.extend((mongo_client,))
     aiohttp.web.run_app(app)

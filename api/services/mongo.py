@@ -47,12 +47,12 @@ class MongoClient:
             logging.error("Error connect to MongoDB: {0}".format(str(exc)))
             raise
 
-    async def insert_foods(self, food_list: List):
+    async def insert_foods(self, food_list: List) -> None:
         """Method to insert called food products to Mongo."""
 
         for food in food_list:
             logging.info("Start insert to Mongo value {0}".format(food.name))
-            await self.mongo_db["food_popular"].insert_one({"user":1, "product": food.name})
+            await self.mongo_db[config.PRODUCTS_INFO_COLLECTION].insert_one({"user":1, "product": food.name})
         logging.info("Food list was successfully added to Mongp.")
 
     async def insert_recipes(self, recipe_list: List) -> None:
@@ -60,7 +60,7 @@ class MongoClient:
         for recipe in recipe_list:
             recipre_name = recipe.get("name")
             logging.info("Start insert to Mongo value {0}".format(recipre_name))
-            await self.mongo_db["recipes"].insert_one({
+            await self.mongo_db[config.RECIPE_INFO_COLLECTION].insert_one({
                 "user": 1, "recipe": recipre_name, "date": datetime.datetime.now()
             })
             logging.info("Recipes was successfully added to Mongp.")
@@ -68,7 +68,7 @@ class MongoClient:
     async def get_foods_popular(self) -> List:
         """Method to get list of most popular products from friz."""
         logging.info("Started get top 10 popular food")
-        popular_food_cursor = self.mongo_db["food_popular"].aggregate([
+        popular_food_cursor = self.mongo_db[config.PRODUCTS_INFO_COLLECTION].aggregate([
             {
                 "$group":
                     {
@@ -86,7 +86,7 @@ class MongoClient:
         """Method to get recipes list of last hour."""
         last_recipes = []
         time_param = datetime.datetime.now() - datetime.timedelta(minutes=config.RECIPES_TIME_DELTA)
-        last_recieps = self.mongo_db["recipes"].find({"date": {"$gte": time_param}})
+        last_recieps = self.mongo_db[config.RECIPE_INFO_COLLECTION].find({"date": {"$gte": time_param}})
         async for document in last_recieps:
             last_recipes.append(document.get("recipe"))
         logging.info("Found {} last recipes.".format(len(last_recipes)))
